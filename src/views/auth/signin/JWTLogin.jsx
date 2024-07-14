@@ -2,19 +2,41 @@ import React from 'react';
 import { Row, Col, Alert, Button } from 'react-bootstrap';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-
+import { login } from '../../../firebase';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 const JWTLogin = () => {
+  const navigate = useNavigate();
+  const handleLogin = async (values) => {
+    const { email, password } = values;
+    try {
+      let userCreds = await login(email, password);
+      if (userCreds.user) {
+        let response = await axios.post('https://react-analytics-tracker-firebase-re03hg6ur.vercel.app/login', {
+          uid: userCreds.user.uid
+        });
+        console.log(response.data);
+        localStorage.setItem('rat:dashboard:appName', response.data.appName);
+        navigate('/app/dashboard/default');
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
   return (
     <Formik
       initialValues={{
-        email: 'info@codedthemes.com',
-        password: '123456',
+        email: '',
+        password: '',
         submit: null
       }}
       validationSchema={Yup.object().shape({
         email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-        password: Yup.string().max(255).required('Password is required')
+        password: Yup.string().max(255).min(6).required('Password is required')
       })}
+      onSubmit={(values) => {
+        handleLogin(values);
+      }}
     >
       {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
         <form noValidate onSubmit={handleSubmit}>
@@ -58,7 +80,7 @@ const JWTLogin = () => {
 
           <Row>
             <Col mt={2}>
-              <Button className="btn-block mb-4" color="primary" disabled={isSubmitting} size="large" type="submit" variant="primary">
+              <Button className="btn-block mb-4" color="primary" disabled={false} size="large" type="submit" variant="primary">
                 Signin
               </Button>
             </Col>

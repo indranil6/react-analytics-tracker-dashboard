@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, createContext } from 'react';
-import { auth } from '../firebase';
+import { onUserStateChange } from '../firebase';
 
 const AuthContext = createContext();
 
@@ -8,10 +8,13 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(
+    localStorage.getItem('rat:dashboard:user') ? JSON.parse(localStorage.getItem('rat:dashboard:user')) : null
+  );
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = onUserStateChange((user) => {
+      localStorage.setItem('rat:dashboard:user', JSON.stringify(user));
       setCurrentUser(user);
     });
 

@@ -5,6 +5,8 @@ import { useAuth } from '../hooks/useAuth';
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
 
+  console.log('currentUser', currentUser);
+
   return currentUser ? children : <Navigate to="/login" />;
 };
 

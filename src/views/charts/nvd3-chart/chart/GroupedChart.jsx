@@ -1,80 +1,80 @@
-import React, { useEffect } from 'react';
-import * as d3 from 'd3';
+import React, { useEffect, useState } from 'react';
+import Chart from 'react-apexcharts';
+import axios from 'axios';
+import { useAuth } from 'hooks/useAuth';
 
-function generateNumber(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
+const Heatmap = () => {
+  const { currentUser } = useAuth();
+  const [chartData, setChartData] = useState({
+    series: [],
+    options: {
+      chart: {
+        type: 'heatmap',
+        height: 350
+      },
+      plotOptions: {
+        heatmap: {
+          shadeIntensity: 0.5,
+          colorScale: {
+            ranges: [
+              { from: 0, to: 0, color: '#00A100', name: 'No Data' },
+              { from: 1, to: 10, color: '#128FD9', name: 'Low' },
+              { from: 11, to: 25, color: '#FFB200', name: 'Medium' },
+              { from: 26, to: 50, color: '#FF0000', name: 'High' }
+            ]
+          }
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      xaxis: {
+        type: 'category',
+        categories: Array.from({ length: 24 }, (_, i) => `${i}:00`) // Represents 24 hours
+      },
+      title: {
+        text: 'Heatmap of Page Views by Hour',
+        align: 'left'
+      }
+    }
+  });
 
-function getDatum() {
-  let data = [];
-  const len = 12;
-
-  for (let i = 0; i < len; i++) {
-    data.push({
-      x: i,
-      y0: generateNumber(0, 60),
-      y1: generateNumber(0, 50),
-      y2: generateNumber(0, 30)
-    });
-  }
-
-  return data;
-}
-
-const GroupedColumnChart = () => {
   useEffect(() => {
-    const data = getDatum();
+    const fetchData = async () => {
+      if (!currentUser) {
+        return;
+      }
 
-    const isSmallScreen = window.matchMedia('(max-width: 1024px)').matches;
-    const customWidth = isSmallScreen ? 300 : 480;
-    const margin = { top: 20, right: 20, bottom: 40, left: 40 };
-    const width = customWidth - margin.left - margin.right;
-    const height = 300 - margin.top - margin.bottom;
+      const token = await currentUser.getIdToken();
+      const Authorization = `Bearer ${token}`;
+      try {
+        const response = await axios.get('https://react-analytics-tracker-firebase-re03hg6ur.vercel.app/api/page-views/heatmap', {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization,
+            Appname: localStorage.getItem('rat:dashboard:appName')
+          }
+        });
+        const data = response.data;
 
-    const svg = d3
-      .select('#multi-chart')
-      .append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+        const series = Object.keys(data).map((date) => ({
+          name: date,
+          data: data[date].map((value, hour) => ({ x: `${hour}:00`, y: value }))
+        }));
 
-    const colorScale = d3.scaleOrdinal().range(['#A389D4', '#04a9f5', '#1de9b6']);
-    const groupKeys = ['y0', 'y1', 'y2'];
+        setChartData((prevData) => ({
+          ...prevData,
+          series
+        }));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
 
-    const xScale = d3
-      .scaleBand()
-      .domain(data.map((d) => d.x))
-      .range([0, width])
-      .padding(0.1);
+    fetchData();
+  }, [currentUser]);
 
-    const yScale = d3
-      .scaleLinear()
-      .domain([0, d3.max(data, (d) => Math.max(d.y0, d.y1, d.y2))])
-      .range([height, 0]);
-
-    data.forEach((d) => {
-      const groupWidth = xScale.bandwidth() / groupKeys.length;
-
-      groupKeys.forEach((key, index) => {
-        svg
-          .append('rect')
-          .attr('x', xScale(d.x) + index * groupWidth)
-          .attr('y', yScale(d[key]))
-          .attr('height', height - yScale(d[key]))
-          .attr('width', groupWidth)
-          .attr('fill', colorScale(key));
-      });
-    });
-
-    // Add X axis
-    svg.append('g').attr('transform', `translate(0,${height})`).call(d3.axisBottom(xScale));
-
-    // Add Y axis
-    svg.append('g').call(d3.axisLeft(yScale));
-  }, []);
-
-  return <div id="multi-chart"></div>;
+  return <Chart options={chartData.options} series={chartData.series} type="heatmap" height={350} />;
 };
 
-export default GroupedColumnChart;
+export default Heatmap;

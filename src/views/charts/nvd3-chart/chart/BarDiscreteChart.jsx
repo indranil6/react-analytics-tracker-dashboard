@@ -1,116 +1,70 @@
-import React, { useState, useEffect } from 'react';
-import * as d3 from 'd3';
+import React, { useEffect, useState } from 'react';
+import Chart from 'react-apexcharts';
+import axios from 'axios';
+import { useAuth } from 'hooks/useAuth';
 
-const datum = [
-  {
-    key: 'Cumulative Return',
-    values: [
-      {
-        label: 'A',
-        value: -29.765957771107,
-        color: '#3ebfea'
+const BarChart = () => {
+  const { currentUser } = useAuth();
+  const [chartData, setChartData] = useState({
+    series: [{ name: 'Page Views', data: [] }],
+    options: {
+      chart: {
+        type: 'bar',
+        height: 350
       },
-      {
-        label: 'B',
-        value: 10,
-        color: '#04a9f5'
+      xaxis: {
+        categories: []
       },
-      {
-        label: 'C',
-        value: 32.807804682612,
-        color: '#ff8a65'
+      yaxis: {
+        title: {
+          text: 'Page Views'
+        }
       },
-      {
-        label: 'D',
-        value: 196.45946739256,
-        color: '#1de9b6'
+      title: {
+        text: 'Page Views by Pathname',
+        align: 'left'
       },
-      {
-        label: 'E',
-        value: 0.25434030906893,
-        color: '#4C5667'
-      },
-      {
-        label: 'F',
-        value: -98.079782601442,
-        color: '#69CEC6'
-      },
-      {
-        label: 'G',
-        value: -13.925743130903,
-        color: '#a389d4'
-      },
-      {
-        label: 'H',
-        value: -5.1387322875705,
-        color: '#FE8A7D'
+      plotOptions: {
+        bar: {
+          horizontal: false
+        }
       }
-    ]
-  }
-];
-
-function BarDiscreteChart() {
-  const isSmallScreen = window.matchMedia('(max-width: 1024px)').matches;
-  const width = isSmallScreen ? 300 : 510;
-  const height = 300;
-
-  const [data, setData] = useState([]);
-
-  useEffect(() => {
-    const chartData = datum;
-    if (chartData.length) {
-      setData(chartData);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (data.length) {
-      drawChart();
     }
   });
 
-  function drawChart() {
-    const margin = { top: 20, right: 50, bottom: 50, left: 50 };
-    const boundedHeight = height - margin.top - margin.bottom;
-    const boundedWidth = width - margin.left - margin.right;
+  useEffect(() => {
+    if (currentUser) {
+      const fetchData = async () => {
+        const token = await currentUser.getIdToken();
+        const Authorization = `Bearer ${token}`;
+        try {
+          const response = await axios.get('https://react-analytics-tracker-firebase-re03hg6ur.vercel.app/api/page-views/bar-chart', {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization,
+              Appname: localStorage.getItem('rat:dashboard:appName')
+            }
+          });
+          const data = response.data;
 
-    const svg = d3
-      .select('#container')
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .style('transform', `translate(${margin.left}px, ${margin.top}px)`);
+          const categories = Object.keys(data);
+          const seriesData = Object.values(data);
 
-    const yAccessor = (d) => d.value;
-    const xAccessor = (d) => d.label;
+          setChartData((prevData) => ({
+            ...prevData,
+            series: [{ ...prevData.series[0], data: seriesData }],
+            options: { ...prevData.options, xaxis: { categories } }
+          }));
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
 
-    const xScale = d3.scaleBand().domain(data[0].values.map(xAccessor)).range([0, boundedWidth]).padding(0.1);
-    const yScale = d3
-      .scaleLinear()
-      .domain([d3.min(data[0].values, yAccessor), d3.max(data[0].values, yAccessor)])
-      .range([boundedHeight, 0]);
+      fetchData();
+    }
+  }, [currentUser]);
 
-    svg
-      .selectAll('rect')
-      .data(data[0].values)
-      .enter()
-      .append('rect')
-      .attr('x', (d) => xScale(xAccessor(d)))
-      .attr('y', (d) => yScale(Math.max(0, yAccessor(d))))
-      .attr('width', xScale.bandwidth())
-      .attr('height', (d) => Math.abs(yScale(0) - yScale(yAccessor(d))))
-      .attr('fill', (d) => d.color)
-      .attr('title', (d) => `${d.label}: ${d.value}`) // Add this line for tooltips
-      .append('title')
-      .text((d) => `${d.label}: ${d.value}`);
+  return <Chart options={chartData.options} series={chartData.series} type="bar" height={350} />;
+};
 
-    svg.append('g').attr('transform', `translate(0, ${boundedHeight})`).call(d3.axisBottom(xScale));
-
-    svg.append('g').call(d3.axisLeft(yScale));
-  }
-
-  return <div id="container"></div>;
-}
-
-export default BarDiscreteChart;
+export default BarChart;

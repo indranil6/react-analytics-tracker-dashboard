@@ -1,10 +1,31 @@
 import React from 'react';
-import { Card, Row, Col } from 'react-bootstrap';
-import { NavLink, Link } from 'react-router-dom';
-
+import { Card, Row, Col, Alert, Button } from 'react-bootstrap';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
 import Breadcrumb from '../../../layouts/AdminLayout/Breadcrumb';
+import { Formik } from 'formik';
+import axios from 'axios';
+import { register } from 'firebase';
 
 const SignUp1 = () => {
+  const navigate = useNavigate();
+  const handleRegister = async (values) => {
+    const { email, password, appName } = values;
+    try {
+      let userCreds = await register(email, password);
+      if (userCreds.user) {
+        let response = await axios.post('https://react-analytics-tracker-firebase-re03hg6ur.vercel.app/register', {
+          uid: userCreds.user.uid,
+          appName
+        });
+        console.log(response.data);
+        localStorage.setItem('rat:dashboard:appName', appName);
+        navigate('/app/dashboard/default');
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
   return (
     <React.Fragment>
       <Breadcrumb />
@@ -24,22 +45,86 @@ const SignUp1 = () => {
                     <i className="feather icon-user-plus auth-icon" />
                   </div>
                   <h3 className="mb-4">Sign up</h3>
-                  <div className="input-group mb-3">
-                    <input type="text" className="form-control" placeholder="Username" />
-                  </div>
-                  <div className="input-group mb-3">
-                    <input type="email" className="form-control" placeholder="Email address" />
-                  </div>
-                  <div className="input-group mb-4">
-                    <input type="password" className="form-control" placeholder="Password" />
-                  </div>
-                  <div className="form-check  text-start mb-4 mt-2">
-                    <input type="checkbox" className="form-check-input" id="customCheck1" defaultChecked={false} />
-                    <label className="form-check-label" htmlFor="customCheck1">
-                      Send me the <Link to="#"> Newsletter</Link> weekly.
-                    </label>
-                  </div>
-                  <button className="btn btn-primary mb-4">Sign up</button>
+                  <Formik
+                    initialValues={{
+                      email: '',
+                      password: '',
+                      appName: '',
+                      submit: null
+                    }}
+                    validationSchema={Yup.object().shape({
+                      email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+                      password: Yup.string().max(255).min(6).required('Password is required'),
+                      appName: Yup.string().max(255).required('Application Name is required')
+                    })}
+                    onSubmit={(values) => {
+                      handleRegister(values);
+                    }}
+                  >
+                    {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+                      <form noValidate onSubmit={handleSubmit}>
+                        <div className="form-group mb-3">
+                          <input
+                            className="form-control"
+                            label="Email Address / Username"
+                            name="email"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            type="email"
+                            value={values.email}
+                          />
+                          {touched.email && errors.email && <small className="text-danger form-text">{errors.email}</small>}
+                        </div>
+                        <div className="form-group mb-4">
+                          <input
+                            className="form-control"
+                            label="Password"
+                            name="password"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            type="password"
+                            value={values.password}
+                          />
+                          {touched.password && errors.password && <small className="text-danger form-text">{errors.password}</small>}
+                        </div>
+
+                        <div className="form-group mb-4">
+                          <input
+                            className="form-control"
+                            label="Application Name"
+                            name="appName"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            type="text"
+                            value={values.appName}
+                          />
+                          {touched.appName && errors.appName && <small className="text-danger form-text">{errors.appName}</small>}
+                        </div>
+
+                        {errors.submit && (
+                          <Col sm={12}>
+                            <Alert>{errors.submit}</Alert>
+                          </Col>
+                        )}
+
+                        <Row>
+                          <Col mt={2}>
+                            <Button
+                              className="btn-block mb-4"
+                              color="primary"
+                              disabled={false}
+                              size="large"
+                              type="submit"
+                              variant="primary"
+                            >
+                              Sign up
+                            </Button>
+                          </Col>
+                        </Row>
+                      </form>
+                    )}
+                  </Formik>
+
                   <p className="mb-2">
                     Already have an account?{' '}
                     <NavLink to={'/auth/signin-1'} className="f-w-400">
