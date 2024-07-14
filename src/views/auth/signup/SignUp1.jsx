@@ -14,7 +14,7 @@ const SignUp1 = () => {
     try {
       let userCreds = await register(email, password);
       if (userCreds.user) {
-        let response = await axios.post('https://react-analytics-tracker-firebase-re03hg6ur.vercel.app/register', {
+        let response = await axios.post('https://react-analytics-tracker-firebase-akrj5ebuo.vercel.app/register', {
           uid: userCreds.user.uid,
           appName
         });

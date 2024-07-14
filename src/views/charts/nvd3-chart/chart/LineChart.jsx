@@ -38,7 +38,7 @@ const LineChart = () => {
 
         // Fetch data from the API
         try {
-          const response = await axios.get('https://react-analytics-tracker-firebase-re03hg6ur.vercel.app/api/page-views/line-chart', {
+          const response = await axios.get('https://react-analytics-tracker-firebase-akrj5ebuo.vercel.app/api/page-views/line-chart', {
             headers: {
               'Content-Type': 'application/json',
               Authorization,

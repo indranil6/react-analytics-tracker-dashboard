@@ -48,7 +48,7 @@ const Heatmap = () => {
       const token = await currentUser.getIdToken();
       const Authorization = `Bearer ${token}`;
       try {
-        const response = await axios.get('https://react-analytics-tracker-firebase-re03hg6ur.vercel.app/api/page-views/heatmap', {
+        const response = await axios.get('https://react-analytics-tracker-firebase-akrj5ebuo.vercel.app/api/page-views/heatmap', {
           headers: {
             'Content-Type': 'application/json',
             Authorization,

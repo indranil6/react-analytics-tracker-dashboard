@@ -12,7 +12,7 @@ const JWTLogin = () => {
     try {
       let userCreds = await login(email, password);
       if (userCreds.user) {
-        let response = await axios.post('https://react-analytics-tracker-firebase-re03hg6ur.vercel.app/login', {
+        let response = await axios.post('https://react-analytics-tracker-firebase-akrj5ebuo.vercel.app/login', {
           uid: userCreds.user.uid
         });
         console.log(response.data);
