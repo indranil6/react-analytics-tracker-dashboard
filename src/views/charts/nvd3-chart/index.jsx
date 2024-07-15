@@ -3,9 +3,11 @@ import { Row, Col, Card } from 'react-bootstrap';
 
 import LineChart from './chart/LineChart';
 import BarDiscreteChart from './chart/BarDiscreteChart';
-import PieDonutChart from './chart/PieDonutChart';
+import PieDonutChart from './chart/ScatterPlot';
 import PieBasicChart from './chart/PieBasicChart';
 import GroupedColumnChart from './chart/GroupedChart';
+import ScatterPlot from './chart/ScatterPlot';
+import Histogram from './chart/Histogram';
 
 const Nvd3Chart = () => {
   return (
@@ -13,9 +15,9 @@ const Nvd3Chart = () => {
       <Row>
         <Col md={6}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <Card.Title as="h5">Line Chart</Card.Title>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <LineChart />
             </Card.Body>
@@ -23,9 +25,9 @@ const Nvd3Chart = () => {
         </Col>
         <Col md={6}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <Card.Title as="h5">Discrete Bar Chart</Card.Title>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <BarDiscreteChart />
             </Card.Body>
@@ -33,9 +35,9 @@ const Nvd3Chart = () => {
         </Col>
         <Col md={6}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <Card.Title as="h5">Grouped Multi-Bar Chart</Card.Title>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body>
               <GroupedColumnChart />
             </Card.Body>
@@ -43,9 +45,9 @@ const Nvd3Chart = () => {
         </Col>
         <Col md={6}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <Card.Title as="h5">Pie Basic Chart</Card.Title>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body className="text-center">
               <PieBasicChart />
             </Card.Body>
@@ -53,11 +55,21 @@ const Nvd3Chart = () => {
         </Col>
         <Col md={6}>
           <Card>
-            <Card.Header>
+            {/* <Card.Header>
               <Card.Title as="h5">Donut Chart</Card.Title>
-            </Card.Header>
+            </Card.Header> */}
             <Card.Body className="text-center">
               <PieDonutChart />
+            </Card.Body>
+          </Card>
+        </Col>
+        <Col md={6}>
+          <Card>
+            {/* <Card.Header>
+              <Card.Title as="h5">Scatter Plot</Card.Title>
+            </Card.Header> */}
+            <Card.Body className="text-center">
+              <Histogram />
             </Card.Body>
           </Card>
         </Col>

@@ -34,17 +34,12 @@ export const renderRoutes = (routes = []) => (
 const routes = [
   {
     exact: 'true',
-    path: '/login',
+    path: '/auth/signin',
     element: lazy(() => import('./views/auth/signin/SignIn1'))
   },
   {
     exact: 'true',
-    path: '/auth/signin-1',
-    element: lazy(() => import('./views/auth/signin/SignIn1'))
-  },
-  {
-    exact: 'true',
-    path: '/auth/signup-1',
+    path: '/auth/signup',
     element: lazy(() => import('./views/auth/signup/SignUp1'))
   },
   {
@@ -55,7 +50,7 @@ const routes = [
       {
         exact: 'true',
         path: '/app/dashboard/default',
-        element: lazy(() => import('./views/dashboard'))
+        element: lazy(() => import('./views/dashboard/index'))
       },
       {
         exact: 'true',

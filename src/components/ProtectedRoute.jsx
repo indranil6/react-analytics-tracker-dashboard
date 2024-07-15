@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
 
   console.log('currentUser', currentUser);
 
-  return currentUser ? children : <Navigate to="/login" />;
+  return currentUser ? children : <Navigate to="/auth/signin" />;
 };
 
 export default ProtectedRoute;

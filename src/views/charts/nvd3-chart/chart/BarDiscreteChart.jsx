@@ -2,9 +2,35 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import axios from 'axios';
 import { useAuth } from 'hooks/useAuth';
+import axiosInstance from 'services/axiosInstance';
+import { GET_PAGE_VIEWS_BAR_CHART } from 'queries/constants';
+import { useQuery } from 'react-query';
 
 const BarChart = () => {
   const { currentUser } = useAuth();
+  const fetchBarChartData = async () => {
+    const token = await currentUser.getIdToken();
+    const Authorization = `Bearer ${token}`;
+    try {
+      const response = await axiosInstance.get('/api/page-views/bar-chart', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization,
+          Appname: localStorage.getItem('rat:dashboard:appName')
+        }
+      });
+      const data = response.data;
+
+      return data;
+    } catch (error) {
+      return {};
+    }
+  };
+  const { data, error, isLoading } = useQuery([GET_PAGE_VIEWS_BAR_CHART, currentUser], fetchBarChartData, {
+    enabled: !!currentUser,
+    cacheTime: 60000,
+    staleTime: 30000
+  });
   const [chartData, setChartData] = useState({
     series: [{ name: 'Page Views', data: [] }],
     options: {
@@ -33,38 +59,19 @@ const BarChart = () => {
   });
 
   useEffect(() => {
-    if (currentUser) {
-      const fetchData = async () => {
-        const token = await currentUser.getIdToken();
-        const Authorization = `Bearer ${token}`;
-        try {
-          const response = await axios.get('https://react-analytics-tracker-firebase-akrj5ebuo.vercel.app/api/page-views/bar-chart', {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization,
-              Appname: localStorage.getItem('rat:dashboard:appName')
-            }
-          });
-          const data = response.data;
+    if (data) {
+      const categories = Object.keys(data);
+      const seriesData = Object.values(data);
 
-          const categories = Object.keys(data);
-          const seriesData = Object.values(data);
-
-          setChartData((prevData) => ({
-            ...prevData,
-            series: [{ ...prevData.series[0], data: seriesData }],
-            options: { ...prevData.options, xaxis: { categories } }
-          }));
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-
-      fetchData();
+      setChartData((prevData) => ({
+        ...prevData,
+        series: [{ ...prevData.series[0], data: seriesData }],
+        options: { ...prevData.options, xaxis: { categories } }
+      }));
     }
-  }, [currentUser]);
+  }, [data]);
 
-  return <Chart options={chartData.options} series={chartData.series} type="bar" height={350} />;
+  return <Chart options={chartData?.options} series={chartData?.series} type="bar" height={350} />;
 };
 
 export default BarChart;

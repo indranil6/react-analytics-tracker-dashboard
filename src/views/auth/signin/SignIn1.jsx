@@ -34,7 +34,7 @@ const Signin1 = () => {
               </p>
               <p className="mb-0 text-muted">
                 Don’t have an account?{' '}
-                <NavLink to="/auth/signup-1" className="f-w-400">
+                <NavLink to="/auth/signup" className="f-w-400">
                   Signup
                 </NavLink>
               </p>

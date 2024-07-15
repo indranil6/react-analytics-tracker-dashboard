@@ -8,13 +8,10 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(
-    localStorage.getItem('rat:dashboard:user') ? JSON.parse(localStorage.getItem('rat:dashboard:user')) : null
-  );
+  const [currentUser, setCurrentUser] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
 
   useEffect(() => {
     const unsubscribe = onUserStateChange((user) => {
-      localStorage.setItem('rat:dashboard:user', JSON.stringify(user));
       setCurrentUser(user);
     });
 

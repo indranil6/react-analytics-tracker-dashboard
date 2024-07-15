@@ -1,57 +1,80 @@
-import React, { useEffect } from 'react';
-import * as d3 from 'd3';
+import React, { useEffect, useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import { GET_PIE_CHART_COMPONENTS } from 'queries/constants';
+import axiosInstance from 'services/axiosInstance';
+import { useAuth } from 'hooks/useAuth';
 
-const datum = [
-  { key: 'One', y: 29, color: '#ff8a65' },
-  { key: 'Two', y: 0, color: '#f4c22b' },
-  { key: 'Three', y: 32, color: '#04a9f5' },
-  { key: 'Four', y: 196, color: '#3ebfea' },
-  { key: 'Five', y: 2, color: '#4F5467' },
-  { key: 'Six', y: 98, color: '#1de9b6' },
-  { key: 'Seven', y: 13, color: '#a389d4' },
-  { key: 'Eight', y: 5, color: '#FE8A7D' }
-];
+const PieChart = () => {
+  const appName = localStorage.getItem('rat:dashboard:appName');
+  const { currentUser } = useAuth();
+  const fetchPieChartData = async ({ queryKey }) => {
+    const token = await currentUser.getIdToken();
+    const Authorization = `Bearer ${token}`;
+    try {
+      const response = await axiosInstance.get(`/api/pie-chart`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Appname: appName,
+          Authorization
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return [];
+    }
+  };
 
-const PieBasicChart = () => {
+  const { data, error, isLoading } = useQuery([GET_PIE_CHART_COMPONENTS, currentUser], fetchPieChartData, {
+    enabled: !!currentUser,
+    cacheTime: 60000,
+    staleTime: 30000
+  });
+
+  const [chartOptions, setChartOptions] = useState({
+    series: [],
+    options: {
+      chart: {
+        type: 'pie'
+      },
+      labels: [],
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }
+      ],
+      title: {
+        text: 'Pie chart of distribution of components and interactions',
+        align: 'left'
+      }
+    }
+  });
+
   useEffect(() => {
-    const width = 300;
-    const height = 300;
-    const radius = Math.min(width, height) / 2;
+    if (data) {
+      const components = data.map((item) => item.component);
+      const interactions = data.map((item) => item.interactions);
+      setChartOptions((prevOptions) => ({
+        ...prevOptions,
+        series: interactions,
+        options: {
+          ...prevOptions.options,
+          labels: components
+        }
+      }));
+    }
+  }, [data]);
 
-    const svg = d3
-      .select('#chart')
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .attr('transform', `translate(${width / 2},${height / 2})`);
-
-    const colorScale = d3.scaleOrdinal().range(['#ff8a65', '#f4c22b', '#04a9f5', '#3ebfea', '#4F5467', '#1de9b6', '#a389d4', '#FE8A7D']);
-
-    const pie = d3.pie().value((d) => d.y);
-
-    const path = d3.arc().outerRadius(radius).innerRadius(0);
-
-    const arcs = svg.selectAll('arc').data(pie(datum)).enter().append('g');
-
-    arcs
-      .append('path')
-      .attr('d', path)
-      .attr('fill', (d) => colorScale(d.data.color))
-      .attr('stroke', 'white')
-      .style('stroke-width', '2px');
-
-    arcs
-      .append('text')
-      .attr('transform', (d) => `translate(${path.centroid(d)})`)
-      .attr('dy', '0.35em')
-      .style('text-anchor', 'middle')
-      .text((d) => d.data.key);
-
-    arcs.append('svg:text').attr('text-anchor', 'middle');
-  }, []);
-
-  return <div id="chart"></div>;
+  return <ReactApexChart options={chartOptions.options} series={chartOptions.series} type="pie" />;
 };
 
-export default PieBasicChart;
+export default PieChart;

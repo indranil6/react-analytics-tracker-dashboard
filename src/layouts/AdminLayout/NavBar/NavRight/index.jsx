@@ -17,7 +17,7 @@ const NavRight = () => {
   const signout = () => {
     logout().then(() => {
       localStorage.removeItem('rat:dashboard:user');
-      navigate('/login');
+      navigate('/auth/signin', { replace: true });
     });
   };
 

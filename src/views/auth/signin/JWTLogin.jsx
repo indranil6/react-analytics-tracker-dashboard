@@ -5,6 +5,7 @@ import { Formik } from 'formik';
 import { login } from '../../../firebase';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import axiosInstance from 'services/axiosInstance';
 const JWTLogin = () => {
   const navigate = useNavigate();
   const handleLogin = async (values) => {
@@ -12,7 +13,7 @@ const JWTLogin = () => {
     try {
       let userCreds = await login(email, password);
       if (userCreds.user) {
-        let response = await axios.post('https://react-analytics-tracker-firebase-akrj5ebuo.vercel.app/login', {
+        let response = await axiosInstance.post('/login', {
           uid: userCreds.user.uid
         });
         console.log(response.data);
@@ -48,6 +49,7 @@ const JWTLogin = () => {
               onBlur={handleBlur}
               onChange={handleChange}
               type="email"
+              placeholder="example@example.com"
               value={values.email}
             />
             {touched.email && errors.email && <small className="text-danger form-text">{errors.email}</small>}
@@ -60,6 +62,7 @@ const JWTLogin = () => {
               onBlur={handleBlur}
               onChange={handleChange}
               type="password"
+              placeholder="Password"
               value={values.password}
             />
             {touched.password && errors.password && <small className="text-danger form-text">{errors.password}</small>}

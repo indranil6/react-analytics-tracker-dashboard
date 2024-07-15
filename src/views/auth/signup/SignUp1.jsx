@@ -4,8 +4,10 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import Breadcrumb from '../../../layouts/AdminLayout/Breadcrumb';
 import { Formik } from 'formik';
-import axios from 'axios';
+
 import { register } from 'firebase';
+import { API_BASE_URL } from 'config/constant';
+import axiosInstance from 'services/axiosInstance';
 
 const SignUp1 = () => {
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ const SignUp1 = () => {
     try {
       let userCreds = await register(email, password);
       if (userCreds.user) {
-        let response = await axios.post('https://react-analytics-tracker-firebase-akrj5ebuo.vercel.app/register', {
+        let response = await axiosInstance.post('/register', {
           uid: userCreds.user.uid,
           appName
         });
@@ -70,6 +72,7 @@ const SignUp1 = () => {
                             name="email"
                             onBlur={handleBlur}
                             onChange={handleChange}
+                            placeholder="example@example.com"
                             type="email"
                             value={values.email}
                           />
@@ -80,6 +83,7 @@ const SignUp1 = () => {
                             className="form-control"
                             label="Password"
                             name="password"
+                            placeholder="Password"
                             onBlur={handleBlur}
                             onChange={handleChange}
                             type="password"
@@ -96,6 +100,7 @@ const SignUp1 = () => {
                             onBlur={handleBlur}
                             onChange={handleChange}
                             type="text"
+                            placeholder="Application Name"
                             value={values.appName}
                           />
                           {touched.appName && errors.appName && <small className="text-danger form-text">{errors.appName}</small>}
@@ -127,7 +132,7 @@ const SignUp1 = () => {
 
                   <p className="mb-2">
                     Already have an account?{' '}
-                    <NavLink to={'/auth/signin-1'} className="f-w-400">
+                    <NavLink to={'/auth/signin'} className="f-w-400">
                       Login
                     </NavLink>
                   </p>

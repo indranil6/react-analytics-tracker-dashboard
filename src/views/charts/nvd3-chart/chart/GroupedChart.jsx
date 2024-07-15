@@ -2,9 +2,30 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import axios from 'axios';
 import { useAuth } from 'hooks/useAuth';
+import axiosInstance from 'services/axiosInstance';
+import { useQuery } from 'react-query';
+import { GET_PAGE_VIEWS_HEATMAP } from 'queries/constants';
 
 const Heatmap = () => {
   const { currentUser } = useAuth();
+  const fetchData = async () => {
+    const token = await currentUser.getIdToken();
+    const Authorization = `Bearer ${token}`;
+    try {
+      const response = await axiosInstance.get('/api/page-views/heatmap', {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization,
+          Appname: localStorage.getItem('rat:dashboard:appName')
+        }
+      });
+      const data = response.data;
+
+      return data;
+    } catch (error) {
+      return {};
+    }
+  };
   const [chartData, setChartData] = useState({
     series: [],
     options: {
@@ -38,41 +59,25 @@ const Heatmap = () => {
       }
     }
   });
+  const { data, isLoading } = useQuery([GET_PAGE_VIEWS_HEATMAP, currentUser], fetchData, {
+    enabled: !!currentUser,
+    cacheTime: 60000,
+    staleTime: 30000
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!currentUser) {
-        return;
-      }
+    if (data) {
+      const series = Object.keys(data).map((date) => ({
+        name: date,
+        data: data[date].map((value, hour) => ({ x: `${hour}:00`, y: value }))
+      }));
 
-      const token = await currentUser.getIdToken();
-      const Authorization = `Bearer ${token}`;
-      try {
-        const response = await axios.get('https://react-analytics-tracker-firebase-akrj5ebuo.vercel.app/api/page-views/heatmap', {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization,
-            Appname: localStorage.getItem('rat:dashboard:appName')
-          }
-        });
-        const data = response.data;
-
-        const series = Object.keys(data).map((date) => ({
-          name: date,
-          data: data[date].map((value, hour) => ({ x: `${hour}:00`, y: value }))
-        }));
-
-        setChartData((prevData) => ({
-          ...prevData,
-          series
-        }));
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, [currentUser]);
+      setChartData((prevData) => ({
+        ...prevData,
+        series
+      }));
+    }
+  }, [data]);
 
   return <Chart options={chartData.options} series={chartData.series} type="heatmap" height={350} />;
 };

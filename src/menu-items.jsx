@@ -13,13 +13,13 @@ const menuItems = {
           icon: 'feather icon-home',
           url: '/app/dashboard/default'
         },
-        {
-          id: 'table',
-          title: 'Table',
-          type: 'item',
-          icon: 'feather icon-server',
-          url: '/tables/bootstrap'
-        },
+        // {
+        //   id: 'table',
+        //   title: 'Table',
+        //   type: 'item',
+        //   icon: 'feather icon-server',
+        //   url: '/tables/bootstrap'
+        // },
         {
           id: 'charts',
           title: 'Charts',
@@ -149,18 +149,18 @@ const menuItems = {
     //       },
     //       children: [
     //         {
-    //           id: 'signup-1',
+    //           id: 'signup',
     //           title: 'Sign up',
     //           type: 'item',
-    //           url: '/auth/signup-1',
+    //           url: '/auth/signup',
     //           target: true,
     //           breadcrumbs: false
     //         },
     //         {
-    //           id: 'signin-1',
+    //           id: 'signin',
     //           title: 'Sign in',
     //           type: 'item',
-    //           url: '/auth/signin-1',
+    //           url: '/auth/signin',
     //           target: true,
     //           breadcrumbs: false
     //         }
