@@ -54,12 +54,14 @@ const DashDefault = () => {
   const { data } = useQuery(['page-dashboard', currentUser], fetchData, {
     enabled: !!currentUser,
     cacheTime: 60000,
-    staleTime: 30000
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
   const { data: allData } = useQuery(['all-page-views', currentUser], fetchAllData, {
     enabled: !!currentUser,
     cacheTime: 60000,
-    staleTime: 30000
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
   const [dashdata, setDashdata] = React.useState([]);
   console.log('allData', allData);

@@ -19,7 +19,8 @@ const SignUp1 = () => {
       if (userCreds.user) {
         let response = await axiosInstance.post('/register', {
           uid: userCreds.user.uid,
-          appName
+          appName,
+          email
         });
         console.log(response.data);
         localStorage.setItem('rat:dashboard:appName', appName);
@@ -53,12 +54,14 @@ const SignUp1 = () => {
                     initialValues={{
                       email: '',
                       password: '',
+                      confirmPassword: '',
                       appName: '',
                       submit: null
                     }}
                     validationSchema={Yup.object().shape({
                       email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
                       password: Yup.string().max(255).min(6).required('Password is required'),
+                      confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match'),
                       appName: Yup.string().max(255).required('Application Name is required')
                     })}
                     onSubmit={(values) => {
@@ -92,6 +95,22 @@ const SignUp1 = () => {
                             value={values.password}
                           />
                           {touched.password && errors.password && <small className="text-danger form-text">{errors.password}</small>}
+                        </div>
+
+                        <div className="form-group mb-4">
+                          <input
+                            className="form-control"
+                            label="Confirm Password"
+                            name="confirmPassword"
+                            placeholder="Confirm Password"
+                            onBlur={handleBlur}
+                            onChange={handleChange}
+                            type="password"
+                            value={values.confirmPassword}
+                          />
+                          {touched.confirmPassword && errors.confirmPassword && (
+                            <small className="text-danger form-text">{errors.confirmPassword}</small>
+                          )}
                         </div>
 
                         <div className="form-group mb-4">

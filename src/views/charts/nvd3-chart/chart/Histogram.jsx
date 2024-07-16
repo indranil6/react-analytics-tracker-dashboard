@@ -33,7 +33,8 @@ const Histogram = () => {
   } = useQuery([GET_HISTOGRAM_DATA, currentUser], fetchHistogramData, {
     enabled: !!currentUser,
     cacheTime: 60000,
-    staleTime: 30000
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
   const series = [
     {
@@ -64,7 +65,9 @@ const Histogram = () => {
       align: 'center'
     }
   };
-
+  if (error) {
+    return null;
+  }
   return <ApexCharts options={options} series={series} type="bar" height={350} />;
 };
 

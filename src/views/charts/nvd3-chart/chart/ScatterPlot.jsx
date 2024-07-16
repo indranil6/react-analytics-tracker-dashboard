@@ -33,7 +33,8 @@ const ScatterPlot = () => {
   } = useQuery([GET_SCATTER_PLOT, currentUser], fetchScatterPlotData, {
     enabled: !!currentUser,
     cacheTime: 60000,
-    staleTime: 30000
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
 
   const series = [
@@ -61,7 +62,9 @@ const ScatterPlot = () => {
       align: 'center'
     }
   };
-
+  if (error) {
+    return null;
+  }
   return <ApexCharts options={options} series={series} type="scatter" height={350} />;
 };
 

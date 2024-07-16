@@ -59,10 +59,11 @@ const Heatmap = () => {
       }
     }
   });
-  const { data, isLoading } = useQuery([GET_PAGE_VIEWS_HEATMAP, currentUser], fetchData, {
+  const { data, isLoading, error } = useQuery([GET_PAGE_VIEWS_HEATMAP, currentUser], fetchData, {
     enabled: !!currentUser,
     cacheTime: 60000,
-    staleTime: 30000
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
 
   useEffect(() => {
@@ -78,7 +79,9 @@ const Heatmap = () => {
       }));
     }
   }, [data]);
-
+  if (error) {
+    return null;
+  }
   return <Chart options={chartData.options} series={chartData.series} type="heatmap" height={350} />;
 };
 

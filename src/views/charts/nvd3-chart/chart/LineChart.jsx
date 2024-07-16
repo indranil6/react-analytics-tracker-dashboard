@@ -54,7 +54,8 @@ const LineChart = () => {
   const { data, error, isLoading } = useQuery([GET_PAGE_VIEWS_LINE_CHART, currentUser], fetchData, {
     enabled: !!currentUser,
     cacheTime: 60000,
-    staleTime: 30000
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
 
   useEffect(() => {
@@ -70,7 +71,9 @@ const LineChart = () => {
       }));
     }
   }, [data]);
-
+  if (error) {
+    return null;
+  }
   return <Chart options={chartData.options} series={chartData.series} type="line" height={350} />;
 };
 

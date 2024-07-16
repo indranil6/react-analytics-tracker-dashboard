@@ -29,7 +29,8 @@ const PieChart = () => {
   const { data, error, isLoading } = useQuery([GET_PIE_CHART_COMPONENTS, currentUser], fetchPieChartData, {
     enabled: !!currentUser,
     cacheTime: 60000,
-    staleTime: 30000
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
 
   const [chartOptions, setChartOptions] = useState({
@@ -73,7 +74,9 @@ const PieChart = () => {
       }));
     }
   }, [data]);
-
+  if (error) {
+    return null;
+  }
   return <ReactApexChart options={chartOptions.options} series={chartOptions.series} type="pie" />;
 };
 

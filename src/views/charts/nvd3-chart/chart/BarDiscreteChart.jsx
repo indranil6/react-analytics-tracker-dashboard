@@ -29,7 +29,8 @@ const BarChart = () => {
   const { data, error, isLoading } = useQuery([GET_PAGE_VIEWS_BAR_CHART, currentUser], fetchBarChartData, {
     enabled: !!currentUser,
     cacheTime: 60000,
-    staleTime: 30000
+    staleTime: 30000,
+    refetchOnWindowFocus: false
   });
   const [chartData, setChartData] = useState({
     series: [{ name: 'Page Views', data: [] }],
@@ -70,7 +71,9 @@ const BarChart = () => {
       }));
     }
   }, [data]);
-
+  if (error) {
+    return null;
+  }
   return <Chart options={chartData?.options} series={chartData?.series} type="bar" height={350} />;
 };
 

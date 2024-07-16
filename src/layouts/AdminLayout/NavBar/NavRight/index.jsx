@@ -139,26 +139,26 @@ const NavRight = () => {
                 </Link>
               </div>
               <ListGroup as="ul" bsPrefix=" " variant="flush" className="pro-body">
-                <ListGroup.Item as="li" bsPrefix=" ">
+                {/* <ListGroup.Item as="li" bsPrefix=" ">
                   <Link to="#" className="dropdown-item">
                     <i className="feather icon-settings" /> Settings
                   </Link>
-                </ListGroup.Item>
+                </ListGroup.Item> */}
                 <ListGroup.Item as="li" bsPrefix=" ">
-                  <Link to="#" className="dropdown-item">
+                  <Link to="/app/profile" className="dropdown-item">
                     <i className="feather icon-user" /> Profile
                   </Link>
                 </ListGroup.Item>
-                <ListGroup.Item as="li" bsPrefix=" ">
+                {/* <ListGroup.Item as="li" bsPrefix=" ">
                   <Link to="#" className="dropdown-item">
                     <i className="feather icon-mail" /> My Messages
                   </Link>
-                </ListGroup.Item>
-                <ListGroup.Item as="li" bsPrefix=" ">
+                </ListGroup.Item> */}
+                {/* <ListGroup.Item as="li" bsPrefix=" ">
                   <Link to="#" className="dropdown-item">
                     <i className="feather icon-lock" /> Lock Screen
                   </Link>
-                </ListGroup.Item>
+                </ListGroup.Item> */}
               </ListGroup>
             </Dropdown.Menu>
           </Dropdown>
