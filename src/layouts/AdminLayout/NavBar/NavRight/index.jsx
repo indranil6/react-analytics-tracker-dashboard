@@ -10,10 +10,12 @@ import avatar2 from '../../../../assets/images/user/avatar-2.jpg';
 import avatar3 from '../../../../assets/images/user/avatar-3.jpg';
 import avatar4 from '../../../../assets/images/user/avatar-4.jpg';
 import { logout } from 'firebase';
+import { useAuth } from 'hooks/useAuth';
 
 const NavRight = () => {
   const [listOpen, setListOpen] = useState(false);
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const signout = () => {
     logout().then(() => {
       localStorage.removeItem('rat:dashboard:user');
@@ -45,7 +47,7 @@ const NavRight = () => {
   return (
     <React.Fragment>
       <ListGroup as="ul" bsPrefix=" " className="navbar-nav ml-auto" id="navbar-right">
-        <ListGroup.Item as="li" bsPrefix=" ">
+        {/* <ListGroup.Item as="li" bsPrefix=" ">
           <Dropdown align="end">
             <Dropdown.Toggle as={Link} variant="link" to="#" id="dropdown-basic">
               <i className="feather icon-bell icon" />
@@ -122,7 +124,7 @@ const NavRight = () => {
               <i className="icon feather icon-mail" />
             </Dropdown.Toggle>
           </Dropdown>
-        </ListGroup.Item>
+        </ListGroup.Item> */}
         <ListGroup.Item as="li" bsPrefix=" ">
           <Dropdown align={'end'} className="drp-user">
             <Dropdown.Toggle as={Link} variant="link" to="#" id="dropdown-basic">
@@ -131,7 +133,7 @@ const NavRight = () => {
             <Dropdown.Menu align="end" className="profile-notification">
               <div className="pro-head">
                 <img src={avatar1} className="img-radius" alt="User Profile" />
-                <span>John Doe</span>
+                <span>{currentUser?.email?.split('@')[0]}</span>
                 <Link to="#" className="dud-logout" title="Logout" onClick={() => signout()}>
                   <i className="feather icon-log-out" />
                 </Link>

@@ -4,7 +4,6 @@ import { ListGroup } from 'react-bootstrap';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import NavGroup from './NavGroup';
-import NavCard from './NavCard';
 
 const NavContent = ({ navigation }) => {
   const navItems = navigation.map((item) => {

@@ -8,6 +8,7 @@ import { Formik } from 'formik';
 import { register } from 'firebase';
 import { API_BASE_URL } from 'config/constant';
 import axiosInstance from 'services/axiosInstance';
+import toast from 'react-hot-toast';
 
 const SignUp1 = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const SignUp1 = () => {
         navigate('/app/dashboard/default');
       }
     } catch (error) {
+      toast.error(error.message);
       console.error(error.message);
     }
   };

@@ -6,6 +6,7 @@ import { login } from '../../../firebase';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import axiosInstance from 'services/axiosInstance';
+import toast from 'react-hot-toast';
 const JWTLogin = () => {
   const navigate = useNavigate();
   const handleLogin = async (values) => {
@@ -22,6 +23,7 @@ const JWTLogin = () => {
       }
     } catch (error) {
       console.error(error.message);
+      toast.error(error.message);
     }
   };
   return (
